@@ -1,0 +1,38 @@
+# **D&D One-Shot Generator**
+
+A full-stack Dungeons & Dragons adventure generator powered by:
+
+- **React + TypeScript + Vite** (frontend)  
+- **Node.js + Express + TypeScript** (backend)  
+- **Supabase** (Google OAuth + Postgres + Row-Level Security)  
+- **D&D 5e API + Open5e API** (monster + magic item data)  
+- **Unified deployment** (Express serves React build → single origin)  
+
+---
+
+## ✨ **Features**
+
+### 🧙‍♂️ **One-Shot Generation**
+
+Generates randomized D&D adventures based on:
+
+- **Party size**
+- **Average level**
+- **Environment** (forest, dungeon, mountain, city, swamp)
+
+Data sources:
+
+- **Monsters** pulled from the **D&D 5e API**
+- **Magic items** pulled from **Open5e**
+
+---
+
+### 🔐 **User Authentication**
+
+- **Google Sign-In** powered by Supabase OAuth
+- The browser stores a **JWT session**
+- Backend verifies every request using Supabase Admin API
+- **Row-Level Security (RLS)** ensures users can
+  - Access **only their own** one-shots  
+  - Modify **only their own** records  
+  - Delete **only their own** content  
