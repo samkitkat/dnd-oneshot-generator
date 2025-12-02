@@ -5,7 +5,7 @@ node_modules/
 dist/
 *.tsbuildinfo
 
-# Local environment files (optional)
+# Local environment files
 .env
 .env.*.local
 

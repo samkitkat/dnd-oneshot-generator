@@ -105,7 +105,7 @@ const App: React.FC = () => {
     setActiveTab(tab);
     setError("");
     setSuccess("");
-  
+
     if (tab === "myshots") {
       // when going to shelf, clear any "in-progress" generated one-shot view
       setCurrentOneShot(null);
@@ -113,28 +113,27 @@ const App: React.FC = () => {
       setCurrentCompleted(false);
       void loadSavedShots();
     }
-  
+
     if (tab === "generate") {
       // Clear any displayed one-shot
       setCurrentOneShot(null);
       setCurrentShotId(null);
       setCurrentCompleted(false);
-    
+
       // Reset form fields
       setCurrentName("");
       setPartySize(1);
       setAverageLevel(1);
       setEnvironment("forest");
-    
+
       // Clear messages
       setError("");
       setSuccess("");
-    
+
       // Stop spinner if stuck (safety)
       setIsGenerating(false);
-    }    
-  };  
-  
+    }
+  };
 
   // ===== Generate =====
   const handleGenerate = async (e: React.FormEvent) => {
@@ -400,8 +399,8 @@ const App: React.FC = () => {
           <h1 className="app-title">One-Shot Archive</h1>
           <p className="app-subtitle">A cozy D&amp;D library.</p>
           <span className="auth-status">
-              {userEmail ? `Signed in as ${userEmail}` : "Not signed in"}
-            </span>
+            {userEmail ? `Signed in as ${userEmail}` : "Not signed in"}
+          </span>
         </div>
 
         <nav className="sidebar-nav">

@@ -62,23 +62,21 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
                 />
               ) : (
                 <>
-                <div style={{display: "flex"}}>
-                  <h2>{title}</h2>
-                  {editableTitle && (
-                    <button
-                      type="button"
-                      className="btn-icon title-edit-button"
-                      onClick={() => setIsEditingTitle(true)}
-                    >
-                      ✏️
-                    </button>
-                  )}
-                                </div>
+                  <div style={{ display: "flex" }}>
+                    <h2>{title}</h2>
+                    {editableTitle && (
+                      <button
+                        type="button"
+                        className="btn-icon title-edit-button"
+                        onClick={() => setIsEditingTitle(true)}
+                      >
+                        ✏️
+                      </button>
+                    )}
+                  </div>
                 </>
               )}
-              <div>
-              {headerRight && <div>{headerRight}</div>}
-              </div>
+              <div>{headerRight && <div>{headerRight}</div>}</div>
             </div>
 
             <p className="hook-text">{oneShot.hook}</p>
