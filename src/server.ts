@@ -1,3 +1,4 @@
+// src/server.ts
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -5,25 +6,27 @@ import path from "path";
 import oneshotsRouter from "./routes/oneshots";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// --- API routes ---
+// API routes
 app.use("/api/oneshots", oneshotsRouter);
 
-// --- Serve React build in production ---
-const distPath = path.join(__dirname, "../frontend/dist");
+// ---- Serve frontend build in production ----
+const distPath = path.resolve(__dirname, "../frontend/dist");
 
-// Serve static files from the Vite build
+// Serve static assets
 app.use(express.static(distPath));
 
-// Match any route that does NOT start with /api
+// SPA fallback: for any non-API route, send index.html
 app.get(/^(?!\/api).*/, (_req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
 
+// Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
