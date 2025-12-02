@@ -42,14 +42,7 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
   return (
     <section className="panel panel-results">
       <header className="panel-header">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            gap: "0.75rem",
-          }}
-        >
+        <div>
           <div>
             <div className="title-row">
               {isEditingTitle ? (
@@ -69,6 +62,7 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
                 />
               ) : (
                 <>
+                <div style={{display: "flex"}}>
                   <h2>{title}</h2>
                   {editableTitle && (
                     <button
@@ -79,23 +73,25 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
                       ✏️
                     </button>
                   )}
+                                </div>
                 </>
               )}
+              <div>
+              {headerRight && <div>{headerRight}</div>}
+              </div>
             </div>
+
             <p className="hook-text">{oneShot.hook}</p>
             <p className="meta-text">
               Party of {oneShot.partySize}, level {oneShot.averageLevel} —{" "}
               Environment: {oneShot.environment}.
             </p>
           </div>
-          {headerRight && <div>{headerRight}</div>}
         </div>
-
-        {actions && <div className="results-actions">{actions}</div>}
       </header>
 
       <div className="section-block">
-        <h3>Bestiary Entries</h3>
+        <h3>Possible Combat Encounters</h3>
         <div className="card-grid">
           {oneShot.monsters.map((m) => (
             <article key={m.name} className="monster-card">
@@ -168,7 +164,7 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
       </div>
 
       <div className="section-block">
-        <h3>Treasures &amp; Curiosities</h3>
+        <h3>Magic Items</h3>
         <div className="card-grid card-grid-loot">
           {oneShot.loot.map((item) => (
             <article key={item.name} className="loot-card">
@@ -187,6 +183,7 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
           ))}
         </div>
       </div>
+      {actions && <div className="results-actions">{actions}</div>}
     </section>
   );
 };

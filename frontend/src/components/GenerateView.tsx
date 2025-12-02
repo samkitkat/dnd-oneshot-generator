@@ -1,5 +1,5 @@
 // src/components/GenerateView.tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { OneShot } from "../types";
 import { OneShotDetail } from "./OneShotDetail";
 
@@ -49,11 +49,37 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
   error,
   success,
 }) => {
+  const loadingMessages = [
+    "Consulting the grand library...",
+    "Summoning monsters...",
+    "Retrieving magical items...",
+  ];
+
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setLoadingMessageIndex(0); // reset when done
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingMessageIndex((i) => (i + 1) % loadingMessages.length);
+    }, 1200); // change message every 1.2 seconds
+
+    return () => clearInterval(interval);
+  }, [isGenerating, loadingMessages.length]);
+
   return (
     <>
       <section className="panel">
         <header className="panel-header">
-          <h2>Create a New One-Shot</h2>
+          <h2>Generate a New One-Shot</h2>
+          <p className="panel-subtitle">
+            Create a ready-to-run adventure in seconds. Just choose your party
+            size, level, and environment, and we’ll generate monsters, magic
+            items, and story sparks to get you rolling.
+          </p>
           <p className="panel-subtitle">
             Choose your party and setting, then let the library conjure an
             adventure.
@@ -119,11 +145,11 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
               className="btn-primary"
               disabled={isGenerating}
             >
-              {isGenerating ? "Summoning monsters..." : "Generate One-Shot"}
+              {isGenerating ? "Summoning..." : "Generate"}
             </button>
             <span className="hint-text">
               {sessionPresent
-                ? "Your one-shot will be ready to save to your library."
+                ? ""
                 : "You can generate without signing in. Sign in if you want to save."}
             </span>
           </div>
@@ -133,7 +159,7 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
           <div className="loading-row">
             <div className="dice-spinner" />
             <span className="loading-text">
-              Consulting the grand library...
+              {loadingMessages[loadingMessageIndex]}
             </span>
           </div>
         )}
@@ -157,10 +183,7 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
               )}
               {currentShotId && (
                 <>
-                  <button
-                    className="btn-secondary"
-                    onClick={onToggleCompleted}
-                  >
+                  <button className="btn-secondary" onClick={onToggleCompleted}>
                     {currentCompleted
                       ? "⬜ Mark Incomplete"
                       : "✅ Mark Completed"}

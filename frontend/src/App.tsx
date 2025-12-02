@@ -20,8 +20,8 @@ const App: React.FC = () => {
 
   const [savedShots, setSavedShots] = useState<SavedOneShotSummary[]>([]);
 
-  const [partySize, setPartySize] = useState<number>(4);
-  const [averageLevel, setAverageLevel] = useState<number>(3);
+  const [partySize, setPartySize] = useState<number>(1);
+  const [averageLevel, setAverageLevel] = useState<number>(1);
   const [environment, setEnvironment] = useState<string>("forest");
 
   const [error, setError] = useState<string>("");
@@ -105,14 +105,36 @@ const App: React.FC = () => {
     setActiveTab(tab);
     setError("");
     setSuccess("");
-
+  
     if (tab === "myshots") {
+      // when going to shelf, clear any "in-progress" generated one-shot view
       setCurrentOneShot(null);
       setCurrentShotId(null);
       setCurrentCompleted(false);
       void loadSavedShots();
     }
-  };
+  
+    if (tab === "generate") {
+      // Clear any displayed one-shot
+      setCurrentOneShot(null);
+      setCurrentShotId(null);
+      setCurrentCompleted(false);
+    
+      // Reset form fields
+      setCurrentName("");
+      setPartySize(1);
+      setAverageLevel(1);
+      setEnvironment("forest");
+    
+      // Clear messages
+      setError("");
+      setSuccess("");
+    
+      // Stop spinner if stuck (safety)
+      setIsGenerating(false);
+    }    
+  };  
+  
 
   // ===== Generate =====
   const handleGenerate = async (e: React.FormEvent) => {

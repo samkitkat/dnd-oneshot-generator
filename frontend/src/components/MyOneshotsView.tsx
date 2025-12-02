@@ -121,7 +121,7 @@ export const MyOneshotsView: React.FC<MyOneshotsViewProps> = ({
           onTitleChange={onRenameCurrent}
           headerRight={
             <button className="btn-secondary" onClick={onBackToShelf}>
-              ← Back to my shelf
+              ← Back to shelf
             </button>
           }
           actions={
