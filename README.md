@@ -6,7 +6,7 @@ A full-stack Dungeons & Dragons adventure generator powered by:
 - **Node.js + Express + TypeScript** (backend)  
 - **Supabase** (Google OAuth + Postgres + Row-Level Security)  
 - **D&D 5e API + Open5e API** (monster + magic item data)  
-- **Unified deployment** (Express serves React build → single origin)  
+- Deploying as a single service on **Railway** where Express serves the built React app 
 
 ---
 
