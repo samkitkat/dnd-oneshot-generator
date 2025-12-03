@@ -9,6 +9,10 @@ type OneShotDetailProps = {
   actions?: React.ReactNode;
   editableTitle?: boolean;
   onTitleChange?: (value: string) => void;
+
+  // Notes support
+  notes?: string;
+  onNotesChange?: (value: string) => void;
 };
 
 export const OneShotDetail: React.FC<OneShotDetailProps> = ({
@@ -18,9 +22,13 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
   actions,
   editableTitle,
   onTitleChange,
+  notes = "",
+  onNotesChange,
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title);
+
+  const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
 
   useEffect(() => {
     setDraftTitle(title);
@@ -61,20 +69,18 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
                   }}
                 />
               ) : (
-                <>
-                  <div style={{ display: "flex" }}>
-                    <h2>{title}</h2>
-                    {editableTitle && (
-                      <button
-                        type="button"
-                        className="btn-icon title-edit-button"
-                        onClick={() => setIsEditingTitle(true)}
-                      >
-                        ✏️
-                      </button>
-                    )}
-                  </div>
-                </>
+                <div style={{ display: "flex" }}>
+                  <h2>{title}</h2>
+                  {editableTitle && (
+                    <button
+                      type="button"
+                      className="btn-icon title-edit-button"
+                      onClick={() => setIsEditingTitle(true)}
+                    >
+                      ✏️
+                    </button>
+                  )}
+                </div>
               )}
               <div>{headerRight && <div>{headerRight}</div>}</div>
             </div>
@@ -95,13 +101,29 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
             <article key={m.name} className="monster-card">
               <header className="monster-card-header">
                 <div>
-                  <h4 className="monster-name">{m.name}</h4>
+                  <h4 className="monster-name">
+                    {m.name}
+                    {m.image && (
+                      <button
+                        type="button"
+                        className="btn-icon monster-image-button"
+                        title="View artwork"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setImageModalUrl(`https://www.dnd5eapi.co${m.image}`);
+                        }}
+                      >
+                        🖼️
+                      </button>
+                    )}
+                  </h4>
                   <div className="monster-subtitle">
                     {[m.size, m.type, m.alignment].filter(Boolean).join(" ")}
                   </div>
                 </div>
                 <span className="monster-cr">CR {m.cr}</span>
               </header>
+
               <div className="monster-divider" />
               <div className="monster-stats">
                 <div className="stat">
@@ -181,7 +203,46 @@ export const OneShotDetail: React.FC<OneShotDetailProps> = ({
           ))}
         </div>
       </div>
+
+      {/* Notes section */}
+      <div className="section-block">
+        <h3>Session Notes</h3>
+        <p className="hint-text">
+          Keep track of what happens in this adventure: NPC names, plot twists,
+          player decisions, and aftermath.
+        </p>
+        <textarea
+          className="notes-textarea"
+          rows={6}
+          placeholder="Example: The goblins surrendered and made a truce with the villagers..."
+          value={notes}
+          onChange={(e) => onNotesChange && onNotesChange(e.target.value)}
+        />
+      </div>
+
       {actions && <div className="results-actions">{actions}</div>}
+
+      {imageModalUrl && (
+        <div
+          className="image-modal-backdrop"
+          onClick={() => setImageModalUrl(null)}
+        >
+          <div className="image-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="image-modal-close"
+              type="button"
+              onClick={() => setImageModalUrl(null)}
+            >
+              ✕
+            </button>
+            <img
+              src={imageModalUrl}
+              alt="Monster artwork"
+              className="image-modal-img"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 };

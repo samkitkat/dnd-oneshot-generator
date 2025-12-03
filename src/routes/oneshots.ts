@@ -1,6 +1,33 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { createClient } from "@supabase/supabase-js";
 
+// ===== Monster list cache =====
+let cachedMonsterList:
+  | { index: string; name: string; url: string }[]
+  | null = null;
+
+let cachedMonsterListFetchedAt: number | null = null;
+
+// Refresh every 10 minutes (600000 ms)
+const MONSTER_LIST_CACHE_TTL = 10 * 60 * 1000;
+
+async function getCachedMonsters() {
+  const now = Date.now();
+
+  if (
+    !cachedMonsterList ||
+    !cachedMonsterListFetchedAt ||
+    now - cachedMonsterListFetchedAt > MONSTER_LIST_CACHE_TTL
+  ) {
+    console.log("Fetching fresh monster list from dnd5eapi.co...");
+    cachedMonsterList = await fetchAllMonsters();
+    cachedMonsterListFetchedAt = now;
+  }
+
+  return cachedMonsterList;
+}
+
+
 const router = Router();
 
 const DND5E_API_BASE = "https://www.dnd5eapi.co";
@@ -66,6 +93,7 @@ type MonsterStatBlock = {
   senses: string | null;
   languages: string | null;
   actions: { name: string; desc: string }[];
+  image?: string | null;   // 👈 NEW
 };
 
 type ItemSummary = {
@@ -158,6 +186,7 @@ async function fetchMonsterDetails(
     senses: sensesText,
     languages: data.languages ?? null,
     actions,
+    image: data.image ?? null,
   };
 }
 
@@ -201,7 +230,7 @@ router.post("/generate", async (req, res) => {
   }
 
   try {
-    const allMonsters = await fetchAllMonsters();
+    const allMonsters = await getCachedMonsters();
     const crTargets = pickCRTargets(averageLevel);
 
     const chosenMonsters: MonsterStatBlock[] = [];
@@ -279,7 +308,11 @@ router.post("/generate", async (req, res) => {
 // ===== Route: POST /api/oneshots  (save one-shot, auth required) =====
 router.post("/", requireSupabaseAuth, async (req: SupabaseAuthRequest, res) => {
   const userId = req.userId!;
-  const { name, oneShot } = req.body as { name: string; oneShot: OneShot };
+  const { name, oneShot, notes } = req.body as {
+    name: string;
+    oneShot: OneShot;
+    notes?: string;
+  };
 
   if (!name || !oneShot) {
     return res.status(400).json({ error: "name and oneShot are required" });
@@ -292,8 +325,9 @@ router.post("/", requireSupabaseAuth, async (req: SupabaseAuthRequest, res) => {
       name,
       data: oneShot,
       completed: false,
+      notes: notes ?? null, // NEW
     })
-    .select("id, name, created_at, completed")
+    .select("id, name, created_at, completed, notes") // NEW: return notes too
     .single();
 
   if (error) {
@@ -310,7 +344,7 @@ router.get("/", requireSupabaseAuth, async (req: SupabaseAuthRequest, res) => {
 
   const { data, error } = await supabaseAdmin
     .from("oneshots")
-    .select("id, name, created_at, completed")
+    .select("id, name, created_at, completed, notes") // NEW: include notes
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
@@ -332,7 +366,7 @@ router.get(
 
     const { data, error } = await supabaseAdmin
       .from("oneshots")
-      .select("id, name, data, created_at, completed")
+      .select("id, name, data, created_at, completed, notes") // NEW: include notes
       .eq("id", id)
       .eq("user_id", userId)
       .single();
@@ -342,25 +376,49 @@ router.get(
       return res.status(404).json({ error: "One-shot not found" });
     }
 
-    return res.json(data);
+    // Frontend expects { id, name, created_at, completed, data, notes }
+    return res.json({
+      id: data.id,
+      name: data.name,
+      created_at: data.created_at,
+      completed: data.completed,
+      data: data.data,
+      notes: data.notes ?? "",
+    });
   }
 );
 
-// ===== Route: PATCH /api/oneshots/:id  (update completed flag) =====
+// ===== Route: PATCH /api/oneshots/:id  (update name/completed/notes) =====
 router.patch(
   "/:id",
   requireSupabaseAuth,
   async (req: SupabaseAuthRequest, res) => {
     const userId = req.userId!;
     const id = req.params.id;
-    const { completed } = req.body as { completed: boolean };
+    const { completed, name, notes } = req.body as {
+      completed?: boolean;
+      name?: string;
+      notes?: string;
+    };
+
+    const update: Record<string, any> = {};
+
+    if (typeof completed === "boolean") update.completed = completed;
+    if (typeof name === "string") update.name = name;
+    if (typeof notes === "string") update.notes = notes;
+
+    if (Object.keys(update).length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No valid fields to update (name, completed, notes)." });
+    }
 
     const { data, error } = await supabaseAdmin
       .from("oneshots")
-      .update({ completed })
+      .update(update)
       .eq("id", id)
       .eq("user_id", userId)
-      .select("id, name, created_at, completed")
+      .select("id, name, created_at, completed, notes")
       .single();
 
     if (error || !data) {

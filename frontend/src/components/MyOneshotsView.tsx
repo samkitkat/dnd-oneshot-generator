@@ -10,6 +10,9 @@ type MyOneshotsViewProps = {
   currentName: string;
   currentCompleted: boolean;
 
+  currentNotes: string;
+  onNotesChange: (value: string) => void;
+
   onOpenShot: (id: string) => void;
   onBackToShelf: () => void;
   onToggleCompletedShot: (shot: SavedOneShotSummary) => void;
@@ -28,6 +31,8 @@ export const MyOneshotsView: React.FC<MyOneshotsViewProps> = ({
   currentOneShot,
   currentName,
   currentCompleted,
+  currentNotes,
+  onNotesChange,
   onOpenShot,
   onBackToShelf,
   onToggleCompletedShot,
@@ -124,6 +129,8 @@ export const MyOneshotsView: React.FC<MyOneshotsViewProps> = ({
               ← Back to shelf
             </button>
           }
+          notes={currentNotes}
+          onNotesChange={onNotesChange}
           actions={
             <>
               <button

@@ -14,6 +14,9 @@ type GenerateViewProps = {
   currentShotId: string | null;
   currentCompleted: boolean;
 
+  currentNotes: string;
+  onNotesChange: (value: string) => void;
+
   onNameChange: (value: string) => void;
   onPartySizeChange: (value: number) => void;
   onAverageLevelChange: (value: number) => void;
@@ -38,6 +41,8 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
   currentOneShot,
   currentShotId,
   currentCompleted,
+  currentNotes,
+  onNotesChange,
   onNameChange,
   onPartySizeChange,
   onAverageLevelChange,
@@ -118,7 +123,9 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
                 min={1}
                 max={20}
                 value={averageLevel}
-                onChange={(e) => onAverageLevelChange(Number(e.target.value))}
+                onChange={(e) =>
+                  onAverageLevelChange(Number(e.target.value))
+                }
                 required
               />
             </label>
@@ -174,6 +181,8 @@ export const GenerateView: React.FC<GenerateViewProps> = ({
           title={currentName || currentOneShot.title}
           editableTitle={true}
           onTitleChange={onNameChange}
+          notes={currentNotes}
+          onNotesChange={onNotesChange}
           actions={
             <>
               {!currentShotId && (

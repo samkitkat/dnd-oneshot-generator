@@ -22,8 +22,8 @@ Generates randomized D&D adventures based on:
 
 Data sources:
 
-- **Monsters** pulled from the **D&D 5e API**
-- **Magic items** pulled from **Open5e**
+- **Monsters** pulled from the **D&D 5e API** [https://www.dnd5eapi.co/]
+- **Magic items** pulled from **Open5e** [https://open5e.com/]
 
 ---
 
